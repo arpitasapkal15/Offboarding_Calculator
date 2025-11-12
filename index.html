@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renewal & Offboarding Timeline Calculator</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light gray background */
+            min-height: 100vh;
+        }
+        .card {
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.15); /* Stronger shadow for professional feel */
+            border: 1px solid #e5e7eb;
+        }
+        .result-box {
+            background-color: #ffffff; /* White background for results */
+            border: 1px solid #d1d5db;
+            transition: all 0.2s ease-in-out;
+        }
+        .result-box:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .copy-btn {
+            opacity: 0.5;
+            transition: opacity 0.2s, background-color 0.2s;
+        }
+        .result-box:hover .copy-btn {
+            opacity: 1;
+        }
+        /* Style for the temporary success message */
+        .copy-success {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 1000;
+            animation: fadeInOut 3s forwards;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+
+    <div id="app" class="w-full max-w-lg card bg-white rounded-xl p-8 md:p-10">
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-2 text-center">Renewal Timeline Calculator</h1>
+        <p class="text-md text-indigo-600 mb-8 text-center font-medium">Critical 30/60/90-Day Milestones</p>
+
+        <!-- Input Section -->
+        <div class="mb-8">
+            <label for="startDate" class="block text-sm font-medium text-gray-700 mb-2">Select Contract/Offboarding Start Date</label>
+            <input type="date" id="startDate" required
+                   class="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600 transition duration-150 ease-in-out text-lg appearance-none">
+        </div>
+
+        <button id="calculateButton"
+                class="w-full bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg shadow-lg hover:bg-indigo-800 transition duration-200 ease-in-out focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-offset-2">
+            Calculate Critical Dates
+        </button>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="mt-10 space-y-5 hidden">
+            <h2 class="text-xl font-bold text-gray-800 border-b-2 border-indigo-200 pb-3">Action Milestones</h2>
+
+            <!-- Result 30 Days -->
+            <div id="result30" class="result-box p-4 rounded-xl flex justify-between items-center">
+                <span class="text-gray-700 font-medium">30 Days (Initial Notice):</span>
+                <div class="flex items-center space-x-3">
+                    <span class="text-xl font-extrabold text-indigo-700" data-date-value="">--/--/----</span>
+                    <button data-copy-target="result30" title="Copy Date" class="copy-btn p-2 rounded-full text-indigo-600 hover:bg-indigo-100 transition duration-150">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v10a2 2 0 002 2h2m0-14v4m0 0v10m0-10h8a2 2 0 012 2v8a2 2 0 01-2 2h-8a2 2 0 01-2-2v-8a2 2 0 012-2zM14 9H9"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Result 60 Days -->
+            <div id="result60" class="result-box p-4 rounded-xl flex justify-between items-center">
+                <span class="text-gray-700 font-medium">60 Days (Mid-Point Review):</span>
+                <div class="flex items-center space-x-3">
+                    <span class="text-xl font-extrabold text-indigo-700" data-date-value="">--/--/----</span>
+                    <button data-copy-target="result60" title="Copy Date" class="copy-btn p-2 rounded-full text-indigo-600 hover:bg-indigo-100 transition duration-150">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v10a2 2 0 002 2h2m0-14v4m0 0v10m0-10h8a2 2 0 012 2v8a2 2 0 01-2 2h-8a2 2 0 01-2-2v-8a2 2 0 012-2zM14 9H9"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Result 90 Days -->
+            <div id="result90" class="result-box p-4 rounded-xl flex justify-between items-center bg-indigo-50 border-indigo-300">
+                <span class="text-gray-700 font-bold">90 Days (Final Renewal/Offboarding):</span>
+                <div class="flex items-center space-x-3">
+                    <span class="text-xl font-extrabold text-indigo-800" data-date-value="">--/--/----</span>
+                    <button data-copy-target="result90" title="Copy Date" class="copy-btn p-2 rounded-full text-indigo-600 hover:bg-indigo-100 transition duration-150">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v10a2 2 0 002 2h2m0-14v4m0 0v10m0-10h8a2 2 0 012 2v8a2 2 0 01-2 2h-8a2 2 0 01-2-2v-8a2 2 0 012-2zM14 9H9"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error/Message Box -->
+        <div id="messageBox" class="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg hidden" role="alert">
+            Please select a valid start date.
+        </div>
+
+    </div>
+    
+    <!-- Copy Success Notification Container -->
+    <div id="copySuccessContainer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const startDateInput = document.getElementById('startDate');
+            const calculateButton = document.getElementById('calculateButton');
+            const resultsSection = document.getElementById('resultsSection');
+            const messageBox = document.getElementById('messageBox');
+            const copySuccessContainer = document.getElementById('copySuccessContainer');
+
+            // Function to add a specified number of days to a date
+            const addDays = (date, days) => {
+                const newDate = new Date(date.valueOf());
+                newDate.setDate(newDate.getDate() + days);
+                return newDate;
+            };
+
+            // Function to format the date for display (MM/DD/YYYY)
+            const formatDate = (date) => {
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                });
+            };
+
+            // Function to show a temporary copy success message
+            const showCopySuccess = (date) => {
+                // Remove any existing messages
+                copySuccessContainer.innerHTML = '';
+                
+                const successDiv = document.createElement('div');
+                successDiv.className = 'copy-success p-4 bg-green-500 text-white rounded-lg shadow-xl flex items-center space-x-2';
+                successDiv.innerHTML = `
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>Copied: <span class="font-bold">${date}</span></span>
+                `;
+                
+                copySuccessContainer.appendChild(successDiv);
+
+                // Remove the message after the animation finishes (3 seconds)
+                setTimeout(() => {
+                    successDiv.remove();
+                }, 3000);
+            };
+
+            // Main calculation and display function
+            const calculateDates = () => {
+                const dateString = startDateInput.value;
+
+                if (!dateString) {
+                    messageBox.textContent = "Please select a valid start date.";
+                    messageBox.classList.remove('hidden');
+                    resultsSection.classList.add('hidden');
+                    return;
+                }
+
+                messageBox.classList.add('hidden');
+                
+                const baseDate = new Date(dateString);
+
+                // Calculate milestone dates
+                const date30 = addDays(baseDate, 30);
+                const date60 = addDays(baseDate, 60);
+                const date90 = addDays(baseDate, 90);
+
+                // Format dates for UI
+                const formattedDate30 = formatDate(date30);
+                const formattedDate60 = formatDate(date60);
+                const formattedDate90 = formatDate(date90);
+
+                // Update UI elements
+                document.querySelector('#result30 [data-date-value]').textContent = formattedDate30;
+                document.querySelector('#result30 [data-date-value]').setAttribute('data-date-value', formattedDate30);
+
+                document.querySelector('#result60 [data-date-value]').textContent = formattedDate60;
+                document.querySelector('#result60 [data-date-value]').setAttribute('data-date-value', formattedDate60);
+                
+                document.querySelector('#result90 [data-date-value]').textContent = formattedDate90;
+                document.querySelector('#result90 [data-date-value]').setAttribute('data-date-value', formattedDate90);
+
+
+                resultsSection.classList.remove('hidden');
+            };
+
+            // Copy to clipboard handler
+            document.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const targetId = event.currentTarget.getAttribute('data-copy-target');
+                    const dateSpan = document.querySelector(`#${targetId} [data-date-value]`);
+                    const dateToCopy = dateSpan.getAttribute('data-date-value');
+
+                    if (dateToCopy && dateToCopy !== '--/--/----') {
+                         try {
+                            // Create a temporary input element
+                            const tempInput = document.createElement('input');
+                            tempInput.value = dateToCopy;
+                            document.body.appendChild(tempInput);
+                            
+                            // Select and copy the text
+                            tempInput.select();
+                            document.execCommand('copy');
+                            
+                            // Clean up
+                            document.body.removeChild(tempInput);
+                            
+                            showCopySuccess(dateToCopy);
+                        } catch (err) {
+                            console.error('Failed to copy text: ', err);
+                        }
+                    }
+                });
+            });
+
+
+            calculateButton.addEventListener('click', calculateDates);
+
+            // Optional: Set default date to today for convenience and initial calculation
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            startDateInput.value = `${year}-${month}-${day}`;
+            
+            // Run calculation on load for the default date
+            calculateDates();
+        });
+    </script>
+</body>
+</html>
